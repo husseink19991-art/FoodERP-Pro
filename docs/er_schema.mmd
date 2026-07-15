@@ -1,0 +1,373 @@
+erDiagram
+    TENANTS ||--o{ ROLES : has
+    TENANTS ||--o{ USERS : has
+    TENANTS ||--o{ CATEGORIES : has
+    TENANTS ||--o{ PRODUCTS : has
+    TENANTS ||--o{ WAREHOUSES : has
+    TENANTS ||--o{ INVENTORY_STOCKS : has
+    TENANTS ||--o{ CUSTOMERS : has
+    TENANTS ||--o{ INVOICES : has
+    TENANTS ||--o{ COLLECTIONS : has
+    TENANTS ||--o{ VEHICLES : has
+    TENANTS ||--o{ GPS_ENGINE_LOGS : has
+    TENANTS ||--o{ FUEL_LOGS : has
+    TENANTS ||--o{ COMMISSION_TIERS : has
+    TENANTS ||--o{ COMMISSIONS : has
+    TENANTS ||--o{ FRAUD_ALERTS : has
+    TENANTS ||--o{ EXPENSES : has
+    TENANTS ||--o{ VAN_INVENTORY : has
+    TENANTS ||--o{ VAN_LOADS : has
+    TENANTS ||--o{ VAN_RECONCILIATIONS : has
+    TENANTS ||--o{ SUPPLIERS : has
+    TENANTS ||--o{ PURCHASES : has
+    TENANTS ||--o{ DEBTS : has
+
+    ROLES ||--o{ USERS : has
+    USERS ||--o{ INVOICES : "sales_rep_id"
+    USERS ||--o{ COLLECTIONS : "collected_by"
+    USERS ||--o{ VEHICLES : "assigned_user_id"
+    USERS ||--o{ COMMISSIONS : has
+    USERS ||--o{ VAN_LOADS : "requested_by"
+    
+    CATEGORIES ||--o{ PRODUCTS : has
+    PRODUCTS ||--o{ INVENTORY_STOCKS : has
+    PRODUCTS ||--o{ INVOICE_ITEMS : has
+    PRODUCTS ||--o{ PURCHASE_ITEMS : has
+    PRODUCTS ||--o{ VAN_INVENTORY : has
+    PRODUCTS ||--o{ VAN_LOAD_ITEMS : has
+
+    WAREHOUSES ||--o{ INVENTORY_STOCKS : has
+    WAREHOUSES ||--o{ VAN_LOADS : has
+
+    CUSTOMERS ||--o{ INVOICES : has
+    CUSTOMERS ||--o{ DEBTS : has
+
+    INVOICES ||--o{ INVOICE_ITEMS : has
+    INVOICES ||--o{ COLLECTIONS : has
+    INVOICES ||--o{ COMMISSIONS : has
+    INVOICES ||--o{ DEBTS : has
+
+    VEHICLES ||--o{ GPS_ENGINE_LOGS : has
+    VEHICLES ||--o{ FUEL_LOGS : has
+    VEHICLES ||--o{ VAN_INVENTORY : has
+    VEHICLES ||--o{ VAN_LOADS : has
+    VEHICLES ||--o{ VAN_RECONCILIATIONS : has
+
+    VAN_LOADS ||--o{ VAN_LOAD_ITEMS : has
+    VAN_RECONCILIATIONS ||--o{ USERS : "sales_rep_id"
+
+    SUPPLIERS ||--o{ PURCHASES : has
+    SUPPLIERS ||--o{ DEBTS : has
+
+    PURCHASES ||--o{ PURCHASE_ITEMS : has
+    PURCHASES ||--o{ DEBTS : has
+
+    TENANTS {
+        uuid id PK
+        string name
+        string domain
+        string database_name
+        jsonb settings
+        boolean is_active
+        datetime created_at
+        datetime updated_at
+        datetime deleted_at
+    }
+
+    ROLES {
+        uuid id PK
+        uuid tenant_id FK
+        string name
+        string slug
+        jsonb permissions
+        datetime created_at
+        datetime updated_at
+    }
+
+    USERS {
+        uuid id PK
+        uuid tenant_id FK
+        string name
+        string email
+        datetime email_verified_at
+        string password
+        uuid role_id FK
+        string remember_token
+        datetime created_at
+        datetime updated_at
+        datetime deleted_at
+    }
+
+    CATEGORIES {
+        uuid id PK
+        uuid tenant_id FK
+        string name
+        string slug
+        datetime created_at
+        datetime updated_at
+    }
+
+    PRODUCTS {
+        uuid id PK
+        uuid tenant_id FK
+        uuid category_id FK
+        string sku
+        string name
+        text description
+        decimal price
+        decimal cost
+        integer reorder_level
+        jsonb attributes
+        datetime created_at
+        datetime updated_at
+        datetime deleted_at
+    }
+
+    WAREHOUSES {
+        uuid id PK
+        uuid tenant_id FK
+        string name
+        string location
+        datetime created_at
+        datetime updated_at
+    }
+
+    INVENTORY_STOCKS {
+        uuid id PK
+        uuid tenant_id FK
+        uuid product_id FK
+        uuid warehouse_id FK
+        integer quantity
+        date expiry_date
+        datetime created_at
+        datetime updated_at
+    }
+
+    CUSTOMERS {
+        uuid id PK
+        uuid tenant_id FK
+        string name
+        string email
+        string phone
+        string address
+        decimal latitude
+        decimal longitude
+        decimal current_balance
+        datetime created_at
+        datetime updated_at
+    }
+
+    INVOICES {
+        uuid id PK
+        uuid tenant_id FK
+        uuid customer_id FK
+        uuid sales_rep_id FK
+        string invoice_number
+        decimal total_amount
+        decimal total_cost
+        decimal discount
+        decimal tax
+        enum status
+        enum payment_type
+        datetime created_at
+        datetime updated_at
+    }
+
+    INVOICE_ITEMS {
+        uuid id PK
+        uuid invoice_id FK
+        uuid product_id FK
+        integer quantity
+        decimal unit_price
+        decimal unit_cost
+        decimal subtotal
+        datetime created_at
+        datetime updated_at
+    }
+
+    COLLECTIONS {
+        uuid id PK
+        uuid tenant_id FK
+        uuid invoice_id FK
+        uuid collected_by FK
+        decimal amount
+        datetime collected_at
+        datetime created_at
+        datetime updated_at
+    }
+
+    VEHICLES {
+        uuid id PK
+        uuid tenant_id FK
+        string plate_number
+        string model
+        uuid assigned_user_id FK
+        datetime created_at
+        datetime updated_at
+    }
+
+    GPS_ENGINE_LOGS {
+        uuid id PK
+        uuid tenant_id FK
+        uuid vehicle_id FK
+        boolean engine_status
+        datetime event_time
+        decimal latitude
+        decimal longitude
+        enum source_method
+        string source_reference
+        jsonb raw_data
+        datetime created_at
+        datetime updated_at
+    }
+
+    FUEL_LOGS {
+        uuid id PK
+        uuid tenant_id FK
+        uuid vehicle_id FK
+        decimal amount
+        decimal liters
+        datetime refuel_time
+        datetime created_at
+        datetime updated_at
+    }
+
+    COMMISSION_TIERS {
+        uuid id PK
+        uuid tenant_id FK
+        string name
+        decimal min_sales
+        decimal max_sales
+        decimal percentage
+        datetime created_at
+        datetime updated_at
+    }
+
+    COMMISSIONS {
+        uuid id PK
+        uuid tenant_id FK
+        uuid user_id FK
+        uuid invoice_id FK
+        decimal amount
+        enum status
+        datetime created_at
+        datetime updated_at
+    }
+
+    FRAUD_ALERTS {
+        uuid id PK
+        uuid tenant_id FK
+        string type
+        jsonb details
+        enum severity
+        boolean is_resolved
+        datetime created_at
+        datetime updated_at
+    }
+
+    EXPENSES {
+        uuid id PK
+        uuid tenant_id FK
+        string category
+        decimal amount
+        text description
+        datetime expense_date
+        datetime created_at
+        datetime updated_at
+    }
+
+    VAN_INVENTORY {
+        uuid id PK
+        uuid tenant_id FK
+        uuid vehicle_id FK
+        uuid product_id FK
+        integer quantity
+        datetime created_at
+        datetime updated_at
+    }
+
+    VAN_LOADS {
+        uuid id PK
+        uuid tenant_id FK
+        uuid vehicle_id FK
+        uuid warehouse_id FK
+        uuid requested_by FK
+        enum status
+        datetime created_at
+        datetime updated_at
+    }
+
+    VAN_LOAD_ITEMS {
+        uuid id PK
+        uuid van_load_id FK
+        uuid product_id FK
+        integer quantity
+        datetime created_at
+        datetime updated_at
+    }
+
+    VAN_RECONCILIATIONS {
+        uuid id PK
+        uuid tenant_id FK
+        uuid vehicle_id FK
+        uuid sales_rep_id FK
+        date reconciliation_date
+        decimal total_sales_reported
+        decimal total_cash_collected
+        decimal total_credit_sales
+        decimal variance
+        enum status
+        text notes
+        datetime created_at
+        datetime updated_at
+    }
+
+    SUPPLIERS {
+        uuid id PK
+        uuid tenant_id FK
+        string name
+        string contact_person
+        string email
+        string phone
+        text address
+        decimal current_balance
+        datetime created_at
+        datetime updated_at
+    }
+
+    PURCHASES {
+        uuid id PK
+        uuid tenant_id FK
+        uuid supplier_id FK
+        string purchase_number
+        decimal total_amount
+        decimal paid_amount
+        enum status
+        date purchase_date
+        datetime created_at
+        datetime updated_at
+    }
+
+    PURCHASE_ITEMS {
+        uuid id PK
+        uuid purchase_id FK
+        uuid product_id FK
+        integer quantity
+        decimal unit_cost
+        decimal subtotal
+        datetime created_at
+        datetime updated_at
+    }
+
+    DEBTS {
+        uuid id PK
+        uuid tenant_id FK
+        enum type
+        uuid entity_id FK
+        uuid reference_id FK
+        decimal amount
+        decimal remaining_balance
+        date due_date
+        datetime created_at
+        datetime updated_at
+    }

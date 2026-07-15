@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build / cache
+.next/
+out/
+build/
+backend/bootstrap/cache/*.php
+!backend/bootstrap/cache/.gitkeep
+
+# Logs
+*.log
+backend/storage/logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
