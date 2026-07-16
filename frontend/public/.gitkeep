@@ -1,0 +1,16 @@
+# Public Assets Directory
+
+This directory contains static assets that are served by Next.js.
+
+## Contents
+
+- Images
+- Fonts
+- Documents
+- Other static files
+
+## Usage
+
+Place any static files here that should be served at the root path.
+
+For example, `public/favicon.ico` will be served at `/favicon.ico`

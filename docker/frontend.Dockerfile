@@ -12,6 +12,9 @@ COPY . .
 
 RUN npm run build
 
+# Ensure public directory exists
+RUN mkdir -p /app/public || true
+
 # Stage 2: Runtime
 FROM node:20-alpine
 
@@ -21,9 +24,17 @@ ENV NODE_ENV=production
 
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
 
-COPY --from=builder /app/public ./public
+# Copy public directory (may be empty or with static assets)
+COPY --from=builder /app/public ./public/
+
+# Copy Next.js standalone output
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+
+# Copy Next.js static files
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Copy package.json for reference
+COPY --chown=nextjs:nodejs package.json ./
 
 USER nextjs
 
