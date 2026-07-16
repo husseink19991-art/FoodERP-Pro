@@ -32,10 +32,16 @@ export async function apiFetch<T = any>(
   try {
     // Inject authorization token if available
     const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...options.headers,
     };
+
+    // Merge with existing headers
+    if (options.headers) {
+      if (typeof options.headers === 'object' && !Array.isArray(options.headers)) {
+        Object.assign(headers, options.headers);
+      }
+    }
 
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;

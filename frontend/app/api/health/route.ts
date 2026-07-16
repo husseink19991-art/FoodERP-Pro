@@ -14,17 +14,16 @@ const healthState = {
 };
 
 /**
- * Track requests for metrics
- */
-export function middleware(request: Request) {
-  healthState.requestCount++;
-}
-
-/**
  * GET /api/health - Basic health status
  * Used by Docker healthcheck and load balancers
+ * 
+ * Query parameters:
+ * - probe: 'live', 'ready', 'deep', 'metrics', or 'status' (default)
  */
 export async function GET(request: Request) {
+  // Track request
+  healthState.requestCount++;
+
   const url = new URL(request.url);
   const probe = url.searchParams.get('probe') || 'status';
 
@@ -100,6 +99,7 @@ export async function GET(request: Request) {
             { status: backendHealthy ? 200 : 503 }
           );
         } catch (error) {
+          healthState.errorCount++;
           return NextResponse.json(
             {
               status: 'unhealthy',
